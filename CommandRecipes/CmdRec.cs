@@ -239,6 +239,10 @@ namespace CommandRecipes
 
 		#region Commands
 		#region Craft
+
+    static readonly Item dummyItem = new Item();
+	  const int CursorSlot = 58;
+
 		void Craft(CommandArgs args)
 		{
 			Item item;
@@ -404,6 +408,7 @@ namespace CommandRecipes
 						args.Player.SendErrorMessage("Insufficient inventory space!");
 						return;
 					}
+
 					foreach (var slot in slots)
 					{
 						item = args.TPlayer.inventory[slot.Key];
@@ -419,7 +424,11 @@ namespace CommandRecipes
 							item.stack -= stack;
 							ing.stack -= stack;
 							NetMessage.SendData((int)PacketTypes.PlayerSlot, -1, -1, NetworkText.Empty, args.Player.Index, slot.Key);
-							if (!recData.droppedItems.ContainsItem(item.Name, item.prefix))
+
+              args.Player.TPlayer.inventory[CursorSlot] = dummyItem;
+						  NetMessage.SendData((int)PacketTypes.PlayerSlot, -1, -1, NetworkText.Empty, args.Player.Index, CursorSlot);
+
+              if (!recData.droppedItems.ContainsItem(item.Name, item.prefix))
 								recData.droppedItems.Add(new RecItem(item.Name, stack, item.prefix));
 							else
 								recData.droppedItems.GetItem(item.Name, item.prefix).stack += slot.Value;
